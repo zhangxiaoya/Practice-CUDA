@@ -12,6 +12,7 @@ int main()
 
     // helloFromGPU
     helloFromGPU<<<1, 10>>>();
-    cudaDeviceReset();
+    //cudaDeviceReset();
+    cudaDeviceSynchronize();
     return 0;
 }
