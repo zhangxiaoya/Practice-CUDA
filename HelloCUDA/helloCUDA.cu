@@ -2,7 +2,8 @@
 
 __global__ void helloFromGPU()
 {
-    printf("Hello World From GPU!\n");
+    if(threadIdx.x == 5)
+        printf("Hello World From GPU %d!\n",threadIdx);
 }
 
 int main()
