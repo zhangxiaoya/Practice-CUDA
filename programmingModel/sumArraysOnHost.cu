@@ -3,7 +3,18 @@
 #include <time.h>
 #include <cuda_runtime.h>
 
-__global__ void sumArraysOnDevice(float* A, float* B, float* C, int N)
+#define CHECK(call)                                                         \
+{                                                                           \
+    const cudaError_t error = call;                                         \
+    if(error != cudaSuccess)                                                \
+    {                                                                       \
+        printf("Error: %s:%d, ", __FILE__, __LINE);                         \
+        printf("code: %d, reason: %s\n", error, cudaGetErrorString(error)); \
+        exit(1);                                                            \
+    }                                                                       \
+}                                                                           \
+
+__global__ void sumArraysOnDevice(float* A, float* B, float* C)
 {
     C[threadIdx.x] = A[threadIdx.x] + B[threadIdx.x];
 }
@@ -66,18 +77,22 @@ int main(void)
     initialData(A, nElem);
     initialData(B, nElem);
 
-    cudaMemCpy(dA,A,nBytes,cudaMemcpyHostToDevice);
-    cudaMemCpy(dB,B,nBytes,cudaMemcpyHostToDevice);
+    cudaMemcpy(dA,A,nBytes,cudaMemcpyHostToDevice);
+    cudaMemcpy(dB,B,nBytes,cudaMemcpyHostToDevice);
 
-    cudaMemCpy(gpuResult,dC,nBytes,cudaMemCpyDeviceToHost);
+    dim3 block(nElem);
+    dim3 grid(nElem / block.x);
+
+    sumArraysOnDevice<<<grid,block>>>(dA,dB,dC);
+    cudaMemcpy(gpuResult,dC,nBytes,cudaMemcpyDeviceToHost);
 
     sumArraysOnHost(A,B,C,nElem);
-    sumArraysOnDevice<<<1,1024>>>(dA,dB,dC,nElem);
 
     checkResult(C,gpuResult,nElem);
     free(A);
     free(B);
     free(C);
+    free(gpuResult);
 
     cudaFree(dA);
     cudaFree(dB);
