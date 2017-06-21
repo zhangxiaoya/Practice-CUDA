@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 #include <cuda_runtime.h>
 
 #define CHECK(call)                                                         \
@@ -13,6 +13,13 @@
         exit(1);                                                            \
     }                                                                       \
 }                                                                           \
+
+double cpuSecond()
+{
+    struct timeval tp;
+    gettimeofday(&tp,NULL);
+    return ((double)tp.tv_sec + (double)tp.tv_usec*1.e-6);
+}
 
 __global__ void sumArraysOnDevice(float* A, float* B, float* C)
 {
@@ -59,7 +66,8 @@ void checkResult(float* hostResult, float* deviceResult, const int N)
 
 int main(void)
 {
-    int nElem = 1024;
+    // int nElem = 1024;
+    int nElem = 1 << 10;
     size_t nBytes = nElem * sizeof(float);
 
     float *A, *B, *C;
@@ -83,7 +91,13 @@ int main(void)
     dim3 block(nElem);
     dim3 grid(nElem / block.x);
 
+    double iStart = cpuSecond();
     sumArraysOnDevice<<<grid,block>>>(dA,dB,dC);
+    cudaDeviceSynchronize();
+    double iElaps = cpuSecond() - iStart;
+
+    printf("GPU time is %f\n",iElaps);
+
     cudaMemcpy(gpuResult,dC,nBytes,cudaMemcpyDeviceToHost);
 
     sumArraysOnHost(A,B,C,nElem);
