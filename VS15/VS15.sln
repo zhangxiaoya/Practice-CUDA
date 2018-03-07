@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StaticGlobalMemory", "Stati
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleMemoryTransfer", "SimpleMemoryTransfer\SimpleMemoryTransfer.vcxproj", "{0343F5D5-A360-4C66-84D6-8220D3604DEC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PinnedMemoryTransfer", "PinnedMemoryTransfer\PinnedMemoryTransfer.vcxproj", "{E689F194-1F7B-44C5-A980-781630E103D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{0343F5D5-A360-4C66-84D6-8220D3604DEC}.Release|x64.Build.0 = Release|x64
 		{0343F5D5-A360-4C66-84D6-8220D3604DEC}.Release|x86.ActiveCfg = Release|Win32
 		{0343F5D5-A360-4C66-84D6-8220D3604DEC}.Release|x86.Build.0 = Release|Win32
+		{E689F194-1F7B-44C5-A980-781630E103D1}.Debug|x64.ActiveCfg = Debug|x64
+		{E689F194-1F7B-44C5-A980-781630E103D1}.Debug|x64.Build.0 = Debug|x64
+		{E689F194-1F7B-44C5-A980-781630E103D1}.Debug|x86.ActiveCfg = Debug|Win32
+		{E689F194-1F7B-44C5-A980-781630E103D1}.Debug|x86.Build.0 = Debug|Win32
+		{E689F194-1F7B-44C5-A980-781630E103D1}.Release|x64.ActiveCfg = Release|x64
+		{E689F194-1F7B-44C5-A980-781630E103D1}.Release|x64.Build.0 = Release|x64
+		{E689F194-1F7B-44C5-A980-781630E103D1}.Release|x86.ActiveCfg = Release|Win32
+		{E689F194-1F7B-44C5-A980-781630E103D1}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
