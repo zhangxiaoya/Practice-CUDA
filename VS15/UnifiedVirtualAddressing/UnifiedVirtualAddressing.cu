@@ -87,15 +87,13 @@ int main(int argc, char* argv[])
 	unsigned int flags = cudaHostAllocMapped;
 	cudaHostAlloc((void**)&h_a, nBytes, flags);
 	cudaHostAlloc((void**)&h_b, nBytes, flags);
-	cudaMalloc(&d_c, nBytes);
+	cudaHostAlloc((void**)&d_c, nBytes, flags);
 
 	hostRef = (float*)malloc(nBytes);
-	gpuRef = (float*)malloc(nBytes);
 
 	initialData(h_a, nElem);
 	initialData(h_b, nElem);
 	memset(hostRef, 0, nBytes);
-	memset(gpuRef, 0, nBytes);
 
 	sumArraysOnHost(h_a, h_b, hostRef, nElem);
 
@@ -103,16 +101,14 @@ int main(int argc, char* argv[])
 	dim3 block(nLen);
 	dim3 grid((nElem + block.x - 1) / block.x);
 
-	sumArraysZeroCopyUVA<<<grid, block >>>(h_a, h_b,d_c, nElem);
+	sumArraysZeroCopyUVA<<<grid, block >>>(h_a, h_b, d_c, nElem);
 
-	cudaMemcpy(gpuRef, d_c, nBytes, cudaMemcpyDeviceToHost);
-	checkResult(hostRef, gpuRef, nElem);
+	checkResult(hostRef, d_c, nElem);
 
-	cudaFree(d_c);
+	cudaFreeHost(d_c);
 	cudaFreeHost(h_a);
 	cudaFreeHost(h_b);
 
-	free(gpuRef);
 	free(hostRef);
 
 	cudaDeviceReset();
