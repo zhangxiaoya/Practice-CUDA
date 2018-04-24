@@ -261,3 +261,14 @@ cudaError_t cudaEventCreateWithFlags(cudaEvent_t* event, unsigned int flags);
 - cudaEventDisableTiming;
 - cudaEventInterprocess;
 
+## 核函数的并行执行
+前面的内容介绍了stream和Event的基本概念，以及并发执行的基本概念，这节内容介绍如何并发执行kernel：
+- 使用深度优先和广度优先的方法分配job
+- 调整硬件队列
+- 避免false-dependence
+- 检查默认stream的阻塞行为
+- 在不同的非默认stream之间添加依赖
+- 实验不同的资源使用对并发的影响
+
+#### 在非空stream上并发执行kernel
+
