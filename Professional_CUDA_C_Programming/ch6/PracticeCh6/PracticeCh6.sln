@@ -13,6 +13,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleMultiStreamBlockingBe
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleMultiStreamAddInternelDependency", "SimpleMultiStreamAddInternelDependency\SimpleMultiStreamAddInternelDependency.vcxproj", "{F573FD0C-A2C4-4BE2-B965-11A4DE3A2CAE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "overlapDataTransferAndCompute", "overlapDataTransferAndCompute\overlapDataTransferAndCompute.vcxproj", "{DAA91244-0EB0-4DC1-B747-9695FABB18F3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "overlapDataTransferAndComputeBreathFirst", "overlapDataTransferAndComputeBreathFirst\overlapDataTransferAndComputeBreathFirst.vcxproj", "{7D2AC770-4DCB-40B0-9531-BA4F37C1D362}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -61,6 +65,22 @@ Global
 		{F573FD0C-A2C4-4BE2-B965-11A4DE3A2CAE}.Release|x64.Build.0 = Release|x64
 		{F573FD0C-A2C4-4BE2-B965-11A4DE3A2CAE}.Release|x86.ActiveCfg = Release|Win32
 		{F573FD0C-A2C4-4BE2-B965-11A4DE3A2CAE}.Release|x86.Build.0 = Release|Win32
+		{DAA91244-0EB0-4DC1-B747-9695FABB18F3}.Debug|x64.ActiveCfg = Debug|x64
+		{DAA91244-0EB0-4DC1-B747-9695FABB18F3}.Debug|x64.Build.0 = Debug|x64
+		{DAA91244-0EB0-4DC1-B747-9695FABB18F3}.Debug|x86.ActiveCfg = Debug|Win32
+		{DAA91244-0EB0-4DC1-B747-9695FABB18F3}.Debug|x86.Build.0 = Debug|Win32
+		{DAA91244-0EB0-4DC1-B747-9695FABB18F3}.Release|x64.ActiveCfg = Release|x64
+		{DAA91244-0EB0-4DC1-B747-9695FABB18F3}.Release|x64.Build.0 = Release|x64
+		{DAA91244-0EB0-4DC1-B747-9695FABB18F3}.Release|x86.ActiveCfg = Release|Win32
+		{DAA91244-0EB0-4DC1-B747-9695FABB18F3}.Release|x86.Build.0 = Release|Win32
+		{7D2AC770-4DCB-40B0-9531-BA4F37C1D362}.Debug|x64.ActiveCfg = Debug|x64
+		{7D2AC770-4DCB-40B0-9531-BA4F37C1D362}.Debug|x64.Build.0 = Debug|x64
+		{7D2AC770-4DCB-40B0-9531-BA4F37C1D362}.Debug|x86.ActiveCfg = Debug|Win32
+		{7D2AC770-4DCB-40B0-9531-BA4F37C1D362}.Debug|x86.Build.0 = Debug|Win32
+		{7D2AC770-4DCB-40B0-9531-BA4F37C1D362}.Release|x64.ActiveCfg = Release|x64
+		{7D2AC770-4DCB-40B0-9531-BA4F37C1D362}.Release|x64.Build.0 = Release|x64
+		{7D2AC770-4DCB-40B0-9531-BA4F37C1D362}.Release|x86.ActiveCfg = Release|Win32
+		{7D2AC770-4DCB-40B0-9531-BA4F37C1D362}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
