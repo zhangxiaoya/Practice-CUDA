@@ -270,5 +270,206 @@ cudaError_t cudaEventCreateWithFlags(cudaEvent_t* event, unsigned int flags);
 - 在不同的非默认stream之间添加依赖
 - 实验不同的资源使用对并发的影响
 
-#### 在非空stream上并发执行kernel
+### 在非空stream上并发执行kernel
 
+一个简单的实验，创建4个kernel函数，每个kernel进行大量的数据计算，创建4个stream，每个stream中多进行着4个kernel操作，一个最简单的例子如下：
+```
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+#include <cmath>
+#include <cstdio>
+
+#define N 3000
+#define NSTREAM 4
+
+__global__ void kernel_1()
+{
+	auto sum = 0.0;
+
+	for (auto i = 0; i < N; i++)
+	{
+		sum = sum + tan(0.1) * tan(0.1);
+	}
+}
+
+__global__ void kernel_2()
+{
+	auto sum = 0.0;
+
+	for (auto i = 0; i < N; i++)
+	{
+		sum = sum + tan(0.1) * tan(0.1);
+	}
+}
+
+__global__ void kernel_3()
+{
+	auto sum = 0.0;
+
+	for (auto i = 0; i < N; i++)
+	{
+		sum = sum + tan(0.1) * tan(0.1);
+	}
+}
+
+__global__ void kernel_4()
+{
+	auto sum = 0.0;
+
+	for (auto i = 0; i < N; i++)
+	{
+		sum = sum + tan(0.1) * tan(0.1);
+	}
+}
+
+int main(int argc, char **argv)
+{
+	int n_streams = NSTREAM;
+	int isize = 1;
+	int iblock = 1;
+
+	float elapsed_time;
+
+	auto dev = 0;
+	cudaDeviceProp deviceProp;
+	cudaGetDeviceProperties(&deviceProp, dev);
+	printf("> Using Device %d: %s with num_streams=%d\n", dev, deviceProp.name, n_streams);
+	cudaSetDevice(dev);
+
+	// check if device support hyper-q
+	if (deviceProp.major < 3 || (deviceProp.major == 3 && deviceProp.minor < 5))
+	{
+		if (deviceProp.concurrentKernels == 0)
+		{
+			printf("> GPU does not support concurrent kernel execution (SM 3.5 or higher required)\n");
+			printf("> CUDA kernel runs will be serialized\n");
+		}
+		else
+		{
+			printf("> GPU does not support HyperQ\n");
+			printf("> CUDA kernel runs will have limited concurrency\n");
+		}
+	}
+
+	printf("> Compute Capability %d.%d hardware with %d multi-processors\n", deviceProp.major, deviceProp.minor, deviceProp.multiProcessorCount);
+
+	// Allocate and initialize an array of stream handles
+	cudaStream_t *streams = static_cast<cudaStream_t *>(malloc(n_streams * sizeof(cudaStream_t)));
+
+	for (auto i = 0; i < n_streams; i++)
+	{
+		cudaStreamCreate(&(streams[i]));
+	}
+
+	// set up execution configuration
+	dim3 block(iblock);
+	dim3 grid(isize / iblock);
+	printf("> grid %d block %d\n", grid.x, block.x);
+
+	// creat events
+	cudaEvent_t start, stop;
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+
+	// record start event
+	cudaEventRecord(start, 0);
+
+	// dispatch job with depth first ordering
+	for (int i = 0; i < n_streams; i++)
+	{
+		kernel_1<<<grid, block, 0, streams[i] >>>();
+		kernel_2<<<grid, block, 0, streams[i] >>>();
+		kernel_3<<<grid, block, 0, streams[i] >>>();
+		kernel_4<<<grid, block, 0, streams[i] >>>();
+	}
+
+	// record stop event
+	cudaEventRecord(stop, 0);
+	cudaEventSynchronize(stop);
+
+	// calculate elapsed time
+	cudaEventElapsedTime(&elapsed_time, start, stop);
+	printf("Measured time for parallel execution = %.3fs\n", elapsed_time / 1000.0f);
+
+	// release all stream
+	for (int i = 0; i < n_streams; i++)
+	{
+		cudaStreamDestroy(streams[i]);
+	}
+
+	free(streams);
+
+	// destroy events
+	cudaEventDestroy(start);
+	cudaEventDestroy(stop);
+
+	// reset device
+	cudaDeviceReset();
+	system("Pause");
+	return 0;
+}
+```
+
+### 广度优先分配任务
+上面这是一个“深度优先”分配task的例子，即，一次性触发一个stream中的所有task kernel函数。下面是“广度优先”分配的例子，每次触发一个stream的一个task。
+```
+	for (int i = 0; i < n_streams; i++)
+	{
+		kernel_1 <<<grid, block, 0, streams[i] >>>();
+	}
+	for (int i = 0; i < n_streams; i++)
+	{
+		kernel_2 <<<grid, block, 0, streams[i] >>>();
+	}
+	for (int i = 0; i < n_streams; i++)
+	{
+		kernel_3 <<<grid, block, 0, streams[i] >>>();
+	}
+	for (int i = 0; i < n_streams; i++)
+	{
+		kernel_4 <<<grid, block, 0, streams[i] >>>();
+	}
+```
+
+### 使用OpenMP分配任务
+```
+	omp_set_num_threads(n_streams);
+	for (int i = 0; i < n_streams; ++i)
+#pragma omp parallel
+	{
+		kernel_1 <<<grid, block, 0, streams[i] >>>();
+		kernel_2 <<<grid, block, 0, streams[i] >>>();
+		kernel_3 <<<grid, block, 0, streams[i] >>>();
+		kernel_4 <<<grid, block, 0, streams[i] >>>();
+	}
+```
+这段代码是使用的openmp，需要在工程中打开openmp的开关，然后在当前文件中包含<omp.h>文件。
+
+### 利用默认stream的任务阻塞其他任务的特性
+默认stream中的task会阻塞非默认stream的task，并且，如果有非默认stream的task在运行，也会阻塞自己。
+```
+for (int i = 0; i < n_streams; i++)
+	{
+		kernel_1 <<<grid, block, 0, streams[i] >>>();
+		kernel_2 <<<grid, block, 0, streams[i] >>>();
+		kernel_3 <<<grid, block>>>();
+		kernel_4 <<<grid, block, 0, streams[i] >>>();
+	}
+```
+kernel_3会在前两个kernel都运行结束后才运行，kernel_4会在kernel_3运行结束后才能运行。
+
+### 添加内部依赖
+使用事件来同步stream之间的操作，比如只有一个stream结束后，才能开始下一个stream。
+```
+for (int i = 0; i < n_streams; i++)
+	{
+		kernel_1 <<<grid, block, 0, streams[i] >>>();
+		kernel_2 <<<grid, block, 0, streams[i] >>>();
+		kernel_3 <<<grid, block, 0, streams[i] >>>();
+		kernel_4 <<<grid, block, 0, streams[i] >>>();
+
+		cudaEventRecord(events[i], streams[i]);
+		cudaStreamWaitEvent(streams[i], events[i], 0);
+	}
+```
+先创建于stream一样多的event，然后用用它们来同步stream之间的顺序执行。

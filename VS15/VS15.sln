@@ -35,6 +35,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cuBLAS", "Chapter8\cuBLAS\c
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cuFFT", "Chapter8\cuFFT\cuFFT.vcxproj", "{E85E74E5-E8E5-4E37-A7E2-1B6BBA96A185}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chapter6_Sream", "Chapter6_Sream", "{231216A6-99CB-4FDF-B1E4-33A22FF8459F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
