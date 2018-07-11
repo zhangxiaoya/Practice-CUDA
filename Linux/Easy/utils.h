@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 
+void PrintGPUProps();
 
 extern "C"
 {
