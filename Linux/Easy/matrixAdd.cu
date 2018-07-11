@@ -43,7 +43,7 @@ void MatrixAddOnDevice(int width, int height)
     cudaMemcpy(DA, A, nBytes, cudaMemcpyHostToDevice);
     cudaMemcpy(DB, B, nBytes, cudaMemcpyHostToDevice);
 
-    dim3 block(1,1);
+    dim3 block(32,32);
     dim3 grid((width + block.x - 1) / block.x,(height + block.y -1)/ block.y);
 
     MatrixAdd<<<grid,block>>>(DA,DB,DC,width,height);
