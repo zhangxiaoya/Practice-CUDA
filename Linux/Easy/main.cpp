@@ -4,6 +4,8 @@
 #include "squareSum.h"
 #include "vectorAdd.cuh"
 
+#include "matrixAdd.cuh"
+
 using namespace std;
 
 int main()
@@ -14,6 +16,7 @@ int main()
         PrintGPUProps();
         squareSum();
         VectorAddOnDevice(1024);
+        MatrixAddOnDevice(100,100);
     }
     return 0;
 }

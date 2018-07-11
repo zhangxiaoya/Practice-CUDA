@@ -42,6 +42,7 @@ void VectorAddOnDevice(int N)
 
     for(int i = 0; i < N;++i)
         printf("%d ", HC[i]);
+    printf("\n");
 
     cudaFree(DA);
     cudaFree(DB);
